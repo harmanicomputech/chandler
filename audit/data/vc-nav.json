@@ -1,0 +1,125 @@
+{
+ "main": [
+  {
+   "label": "Hotels",
+   "href": "/hotels/"
+  },
+  {
+   "label": "Restaurants",
+   "href": "/restaurants/"
+  },
+  {
+   "label": "Things To Do",
+   "href": "/things-to-do/"
+  },
+  {
+   "label": "Events",
+   "href": "/events/"
+  },
+  {
+   "label": "Plan Your Visit",
+   "href": "/plan-your-visit/"
+  }
+ ],
+ "secondary": [
+  {
+   "label": "Business Travelers",
+   "href": "/business-travelers/"
+  },
+  {
+   "label": "Meetings",
+   "href": "/meetings/"
+  },
+  {
+   "label": "Weddings",
+   "href": "/weddings/"
+  },
+  {
+   "label": "Blog",
+   "href": "https://www.visitchandler.com/blog/"
+  }
+ ],
+ "footer": [
+  {
+   "label": "Read More",
+   "href": "https://www.visitchandler.com/things-to-do/outdoor-recreation/hiking/"
+  },
+  {
+   "label": "Request a Visitors Guide",
+   "href": "https://www.visitchandler.com/visitors-guide/"
+  },
+  {
+   "label": "Download Our Visitors Guide",
+   "href": "https://www.visitchandler.com/visitors-guide/"
+  },
+  {
+   "label": "Sign up for our Newsletter",
+   "href": "https://www.visitchandler.com/enewsletter/"
+  },
+  {
+   "label": "Chandler, Arizona Tourism Office",
+   "href": "https://www.visitchandler.com/"
+  },
+  {
+   "label": "Visit our facebook page",
+   "href": "https://www.facebook.com/VisitChandler"
+  },
+  {
+   "label": "Visit our instagram page",
+   "href": "https://www.instagram.com/visitchandler/"
+  },
+  {
+   "label": "Visit our tiktok page",
+   "href": "https://www.tiktok.com/@visitchandler"
+  },
+  {
+   "label": "Visit our linkedin page",
+   "href": "https://www.linkedin.com/company/visit-chandler/"
+  },
+  {
+   "label": "Visit our youtube page",
+   "href": "https://www.youtube.com/@VisitChandler"
+  },
+  {
+   "label": "Visit our pinterest page",
+   "href": "https://www.pinterest.com/visitchandler/"
+  },
+  {
+   "label": "About Us",
+   "href": "/about-chandler-tourism/"
+  },
+  {
+   "label": "Contact Us",
+   "href": "/contact/"
+  },
+  {
+   "label": "Media",
+   "href": "/media/"
+  },
+  {
+   "label": "Partner With Us",
+   "href": "/partnerwithus/"
+  },
+  {
+   "label": "Sitemap",
+   "href": "https://www.visitchandler.com/sitemap/"
+  },
+  {
+   "label": "Privacy Policy",
+   "href": "/privacy-policy/"
+  },
+  {
+   "label": "Accessibility Statement",
+   "href": "/accessibility-statement/"
+  },
+  {
+   "label": "",
+   "href": "https://www.simpleviewinc.com/our-services/creative-design/"
+  },
+  {
+   "label": "privacy policy",
+   "href": "https://www.visitchandler.com/privacy-policy/"
+  }
+ ],
+ "dropdowns": {}
+}

@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function NotFound() { return (<section className="mx-auto max-w-2xl px-5 py-32 text-center"><p className="font-mono text-xs uppercase tracking-widest text-edo-skytext">404</p><h1 className="mt-3 font-[family-name:var(--font-edo-display)] text-4xl font-bold text-edo-navy">Page not found</h1><p className="mt-4 text-edo-slate">This page may have moved from chandleraz.gov.</p><Link href="/edo/" className="mt-8 inline-block bg-edo-navy px-6 py-3 font-semibold text-white">Economic Development home</Link></section>); }

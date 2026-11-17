@@ -1,0 +1,44 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "visit": {
+    "color": {
+      "brand": {
+        "blue":  { "$value": "#214FA1", "$description": "Primary — extracted from the official Visit Chandler logo SVG (23 fills). Contrast on white 7.8:1" },
+        "teal":  { "$value": "#00C1A0", "$description": "Secondary — extracted from the official logo SVG; accents & highlights only. 2.3:1 on white — never text" }
+      },
+      "interface": {
+        "navy":       { "$value": "#172B4D", "$description": "Proposed interface colour (deep navy) — not a logo colour" },
+        "navy-950":   { "$value": "#0D1A30" },
+        "mist":       { "$value": "#F5F8FA", "$description": "Proposed light background" },
+        "white":      { "$value": "#FFFFFF" },
+        "ink-soft":   { "$value": "#4A5A74", "$description": "Body copy on white — 7.0:1 (6.6:1 on mist)" },
+        "line":       { "$value": "#DFE6EE" }
+      },
+      "blue-scale": { "50": "#EEF3FB", "100": "#DCE6F6", "200": "#B6C9EC", "300": "#85A3DD", "400": "#4F78C6", "500": "#214FA1", "600": "#1C4489", "700": "#173870" },
+      "teal-scale": { "50": "#E6FAF6", "100": "#C2F2E8", "200": "#8AE6D4", "300": "#45D7BC", "400": "#00C1A0", "500": "#00A88B", "600": "#008A73", "700": "#00715E" },
+      "usage-rules": {
+        "teal-text": "Teal #00C1A0 on white is 2.3:1 — never use for text. Use teal-700 #00715E (6.0:1) for teal text.",
+        "blue-text": "Brand blue #214FA1 on white is 7.8:1 — AA/AAA for text.",
+        "navy-on-teal": "Navy #172B4D on teal #00C1A0 is 6.1:1 — used for primary CTA buttons. teal-600 #008A73 (4.3:1) is for icons/graphics only (≥3:1)."
+      }
+    },
+    "font": {
+      "display": { "$value": "Instrument Serif", "$description": "Editorial display (self-hosted, OFL)" },
+      "body":    { "$value": "Hanken Grotesk Variable", "$description": "Humanist grotesk UI/body (self-hosted, OFL)" }
+    },
+    "radius": { "card": "1.25rem", "pill": "9999px", "input": "0.75rem" },
+    "motion": { "ease-out-expo": "cubic-bezier(0.16, 1, 0.3, 1)", "reveal-duration": "900ms", "stagger": "60–90ms" }
+  },
+  "edo": {
+    "color": {
+      "ink":   { "$value": "#021F31" },
+      "navy":  { "$value": "#003C5C", "$description": "chandleraz.gov theme primary (most used colour in City CSS)" },
+      "sky":   { "$value": "#187DAE", "$description": "chandleraz.gov theme accent" },
+      "gold":  { "$value": "#FFC25F", "$description": "chandleraz.gov theme highlight — data emphasis on dark only" },
+      "green": { "$value": "#11A26F", "$description": "chandleraz.gov theme — positive/status" },
+      "paper": { "$value": "#F6F7F8" }, "line": { "$value": "#D8DDE2" }, "slate": { "$value": "#4A4A4A" }
+    },
+    "font": { "display": "Sora Variable", "body": "IBM Plex Sans", "data": "IBM Plex Mono" },
+    "radius": { "default": "0", "chart-bar-end": "4px" }
+  }
+}

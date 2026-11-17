@@ -1,0 +1,35 @@
+{
+ "/american/": {
+  "recids": [],
+  "reportedTotal": null,
+  "capturedAt": "2026-11-17T22:23:19.829Z"
+ },
+ "/bbq/": {
+  "recids": [],
+  "reportedTotal": null,
+  "capturedAt": "2026-11-17T22:23:23.438Z"
+ },
+ "/business-travelers/top-coworking-spaces-in-chandler/": {
+  "recids": [],
+  "reportedTotal": null,
+  "capturedAt": "2026-11-17T22:23:27.865Z"
+ },
+ "/cocktails-winebars/": {
+  "recids": [],
+  "reportedTotal": null,
+  "capturedAt": "2026-11-17T22:23:31.320Z"
+ },
+ "/coffee-shops/": {
+  "recids": [],
+  "reportedTotal": null,
+  "capturedAt": "2026-11-17T22:23:35.511Z"
+ },
+ "/dessert/": {
+  "recids": [],
+  "reportedTotal": null,
+  "capturedAt": "2026-11-17T22:23:39.349Z"
+ },
+ "/hotels-with-shuttles/": {
+  "error": "page.goto: net::ERR_ABORTED; maybe frame was detached?\nCall log:\n\u001b[2m  - navigating to \"https://www.visitchandler.com/hotels-with-shuttles/\", waiting until \"networkidle\"\u001b[22m\n"
+ }
+}
