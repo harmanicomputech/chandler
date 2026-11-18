@@ -20,6 +20,9 @@
 | WeatherBadge / WeatherCard / WeatherCentre / HourlyChart | `components/visit/*` | Live NWS data, chart with table alternative |
 | TripPlanner | `components/visit/TripPlanner.tsx` | Itinerary builder, share/print |
 | Concierge | `components/visit/Concierge.tsx` | AI vs verified separation |
+| SavedList / CopyCollection | `components/visit/*` | Saved places, share link, copy shared list |
+| EdoEventRow | `components/edo/EdoEventRow.tsx` | Dated / ongoing business events |
+| TrendChart | `components/admin/TrendChart.tsx` | Responsive single-series trend with crosshair, keyboard reading and data table |
 | Blocks | `components/visit/Blocks.tsx` | Migrated tiles, embeds, galleries, forms |
 | SmartForm | `components/shared/SmartForm.tsx` | Spec-driven, inline errors, honeypot, live region; Visit & EDO themes |
 | NewsletterForm / NewsletterEdo | | Consent required |

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, ArrowUpRight, Building2, Rocket, Store, GraduationCap, Globe2, MapPinned, Landmark, Handshake } from 'lucide-react';
-import { getIndicators, getIndustries, getDistricts, queryProperties } from '@/lib/edo-content';
+import { getIndicators, getIndustries, getDistricts, queryProperties, getEdoEvents } from '@/lib/edo-content';
+import { EdoEventRow } from '@/components/edo/EdoEventRow';
 import { queryArticles } from '@/lib/content';
 import { Stat } from '@/components/edo/Stat';
 import { BarChart } from '@/components/edo/BarChart';
@@ -12,7 +13,8 @@ import { JsonLd } from '@/components/shared/JsonLd';
 export const revalidate = 600;
 
 export default async function EdoHome() {
-  const [ind, industries, districts, props, news] = await Promise.all([getIndicators(), getIndustries(), getDistricts(), queryProperties(), queryArticles({ site: 'edo', limit: 3 })]);
+  const [ind, industries, districts, props, news, evs] = await Promise.all([getIndicators(), getIndustries(), getDistricts(), queryProperties(), queryArticles({ site: 'edo', limit: 3 }), getEdoEvents()]);
+  const nextEvents = [...evs.upcoming, ...evs.ongoing].slice(0, 3);
   const k = (key: string) => ind.find((x) => x.key === key);
   const headline = ['bond_rating', 'city_sales_tax', 'fortune_1000_presence', 'office_sf', 'industrial_sf', 'az_corporate_tax'].map(k).filter(Boolean) as typeof ind;
   const employers = ind.filter((x) => x.key.startsWith('top_employer_')).sort((a, b) => (b.numericValue ?? 0) - (a.numericValue ?? 0));
@@ -123,6 +125,16 @@ export default async function EdoHome() {
           </ul>
         </div>
       </section>
+
+      {/* EVENTS */}
+      {nextEvents.length > 0 && (
+        <section className="py-20" aria-labelledby="edo-events">
+          <div className="mx-auto max-w-[1440px] px-5 sm:px-8">
+            <div className="flex items-end justify-between"><h2 id="edo-events" className="font-[family-name:var(--font-edo-display)] text-4xl font-bold tracking-tight text-edo-navy">Upcoming business events</h2><Link href={edo('/events/')} className="text-sm font-semibold text-edo-skytext">All events →</Link></div>
+            <ul className="mt-8 space-y-px bg-edo-line">{nextEvents.map(({ e }) => <EdoEventRow key={e.id} e={e} />)}</ul>
+          </div>
+        </section>
+      )}
 
       {/* NEWS */}
       {news.rows.length > 0 && (

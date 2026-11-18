@@ -229,3 +229,56 @@ test('@mobile navigation drawer, hero search and directory work on phones', asyn
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow, 'no horizontal page scroll').toBeLessThanOrEqual(1);
 });
+
+/* ─────────────── Saved collections ─────────────── */
+test('saved places: save two items, share the list, recipient copies it into their own saved list', async ({ page, browser }) => {
+  await page.goto('/listing/10%3a19-coffee/4484/');
+  await page.getByRole('button', { name: 'Save to trip' }).click();
+  await page.goto('/event/16th-annual-arizona-balloon-classic/8751/');
+  await page.getByRole('button', { name: 'Save to trip' }).click();
+  await page.getByRole('link', { name: /Saved places \(2 saved\)/ }).click();
+  await expect(page).toHaveURL(/\/saved\//);
+  await page.getByLabel('List name').fill('QA weekend list');
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.getByRole('button', { name: 'Share this list' }).click();
+  const link = page.locator('a[href*="/collections/"]');
+  await expect(link).toBeVisible();
+  const url = (await link.getAttribute('href'))!;
+  const other = await browser.newContext(); const p2 = await other.newPage();       // a different visitor
+  await p2.goto(url);
+  await expect(p2.getByRole('heading', { level: 1 })).toContainText('QA weekend list');
+  await expect(p2.getByRole('link', { name: '10:19 Coffee' }).first()).toBeVisible();
+  await expect(p2.getByText('16th Annual Arizona Balloon Classic').first()).toBeVisible();
+  await p2.getByRole('button', { name: 'Save all to my list' }).click();
+  await p2.goto('/saved/');
+  await expect(p2.getByText('2 saved places')).toBeVisible();
+  await other.close();
+});
+
+test('collections API rejects unpublished or unknown records', async ({ request }) => {
+  const r = await request.post('/api/collections/', { data: { title: 'x', items: [{ kind: 'listing', id: 999999999 }] } });
+  expect(r.status()).toBe(422);
+});
+
+test('EDO events: upcoming, ongoing and past sections with sourced detail pages', async ({ page }) => {
+  await page.goto('/edo/events/');
+  await expect(page.getByRole('heading', { name: 'Ongoing programs' })).toBeVisible();
+  await expect(page.getByText('Chandler Endeavor Venture Innovation Incubator')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Past events' })).toBeVisible();
+  await page.getByRole('link', { name: 'Annual Chandler Innovation Fair' }).click();
+  await expect(page).toHaveURL(/\/edo\/events\/chandler-innovation-fair\//);
+  await expect(page.getByText('Annually in February').first()).toBeVisible();
+  await expect(page.getByText(/Source: https:\/\/www\.chandleraz\.gov/)).toBeVisible();
+});
+
+test('@mobile no horizontal overflow on key pages (including embedded maps)', async ({ page }) => {
+  for (const p of ['/', '/hotels/', '/listing/10%3a19-coffee/4484/', '/plan-your-visit/weather/', '/edo/', '/edo/contact-us/', '/edo/properties/', '/edo/data/', '/saved/']) {
+    await page.goto(p, { waitUntil: 'networkidle' });
+    const over = await page.evaluate(() => {
+      const clipped = (el: Element) => { for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) { const o = getComputedStyle(a).overflowX; if (o !== 'visible') return true; } return false; };
+      const rights = [...document.querySelectorAll('body *')].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).position !== 'fixed' && !clipped(e); }).map((e) => e.getBoundingClientRect().right);
+      return Math.max(0, ...rights) - window.innerWidth;
+    });
+    expect(over, `${p} content wider than viewport`).toBeLessThanOrEqual(1);
+  }
+});

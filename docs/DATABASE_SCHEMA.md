@@ -29,7 +29,7 @@ PostgreSQL 16 · Drizzle ORM · source `src/db/schema.ts` · migrations `drizzle
 | Workflow | `submissions` | site, type enum (12 kinds), status enum, payload (jsonb), entity/entity_id, submitted_by, assigned_to, notes (jsonb), crm_sync_status | idx(site, type, status) |
 | | `newsletter_subscribers` | site, email, interests, consent_at, sync_status, unsubscribed_at | unique(site, email) |
 | Visitor | `itineraries` | share_token (public), edit_token (sha256), dates, interests, days (jsonb) | unique(share_token) |
-| | `collections` | share_token, items (jsonb) | unique(share_token) |
+| | `collections` | share_token, title, items (jsonb `{kind,id}`) — shared saved-places lists | unique(share_token) |
 | Platform | `redirects` | site, from_path, to_path, status_code, hits | unique(site, from_path) |
 | | `audit_logs` | user_id, action, entity, entity_id, site, detail, ip | idx(created_at), idx(entity, entity_id) |
 | | `analytics_events` | site, name, path, entity, entity_id, props | idx(site, name, created_at) |
@@ -39,4 +39,4 @@ PostgreSQL 16 · Drizzle ORM · source `src/db/schema.ts` · migrations `drizzle
 | | `api_cache` | key, value, fetched_at, expires_at | PK(key) |
 
 ## Migration data volumes (seeded from the audit)
-listings 783 · events 27 · articles 166 (Visit) + 10 (EDO) · pages 215 (Visit) + 37 (EDO) · media ≈ 3,000 · indicators 41 · staff 8 · reports 19 · districts 4 · industries 6 · redirects 48 · properties 10 (fixtures).
+listings 783 · events 27 (Visit) + 7 (EDO) · articles 166 (Visit) + 10 (EDO) · pages 215 (Visit) + 37 (EDO) · media ≈ 3,000 · indicators 41 · staff 8 · reports 19 · districts 4 · industries 6 · redirects 48 · properties 10 (fixtures).

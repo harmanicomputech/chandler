@@ -91,7 +91,7 @@ async function dl(it) {
   // Full manifest also lists every image seen on every page (even those not migrated).
   const all = new Map();
   for (const p of pages) (p.images || []).forEach((i) => { if (!all.has(i.src)) all.set(i.src, { ...i, page: p.url }); });
-  const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const esc = (v) => `"${String(v ?? '').replace(/\s+/g, ' ').trim().replace(/"/g, '""')}"`;
   const rows = [['source_url', 'local_path', 'original_page', 'image_description', 'width', 'height', 'format', 'alt_text', 'attribution', 'permission_status', 'role', 'notes'].join(',')];
   const perm = [['source_url', 'local_path', 'permission_status', 'rights_holder', 'basis', 'action_required'].join(',')];
   for (const [src, i] of all) {

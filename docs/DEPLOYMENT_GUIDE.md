@@ -38,7 +38,7 @@ Then: rotate the seeded demo accounts (create real staff users, disable `*@chand
 * Object storage versioning on `/uploads`.
 * Content version history allows editor-level rollback without DB restores.
 
-## CI/CD (recommended pipeline)
+## CI/CD (`.github/workflows/ci.yml`, included)
 1. `npm ci` → `npx tsc --noEmit` → `npm run build`
 2. Spin up Postgres service → `npm run db:migrate && npm run db:seed` → `npm start` (port 3001) → `npx playwright test --trace off`
 3. Deploy to staging (indexing disabled) → UAT → promote to production.

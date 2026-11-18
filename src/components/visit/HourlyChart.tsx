@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type H = { start: string; temp: number; pop: number | null; short: string };
 /**
@@ -10,7 +10,11 @@ export function HourlyChart({ hours }: { hours: H[] }) {
   const data = hours.slice(0, 24);
   const [i, setI] = useState<number | null>(null);
   const ref = useRef<SVGSVGElement>(null);
-  const W = 960, H1 = 200, H2 = 70, PAD = { l: 36, r: 12, t: 16, b: 22 };
+  const box = useRef<HTMLDivElement>(null);
+  const [W, setW] = useState(960);
+  // Draw at the container's real pixel width so axis text stays legible on phones (no SVG down-scaling).
+  useEffect(() => { const el = box.current; if (!el) return; const ro = new ResizeObserver(([e]) => setW(Math.max(300, Math.round(e.contentRect.width)))); ro.observe(el); return () => ro.disconnect(); }, []);
+  const H1 = 200, H2 = 70, PAD = { l: 36, r: 12, t: 16, b: 22 };
   const temps = data.map((d) => d.temp);
   const min = Math.floor((Math.min(...temps) - 3) / 5) * 5, max = Math.ceil((Math.max(...temps) + 3) / 5) * 5;
   const x = (n: number) => PAD.l + (n / Math.max(1, data.length - 1)) * (W - PAD.l - PAD.r);
@@ -28,7 +32,7 @@ export function HourlyChart({ hours }: { hours: H[] }) {
   return (
     <figure className="relative">
       <figcaption className="sr-only">Hourly temperature and chance of precipitation for the next 24 hours. A data table follows.</figcaption>
-      <div className="relative" onPointerLeave={() => setI(null)}>
+      <div ref={box} className="relative" onPointerLeave={() => setI(null)}>
         <svg ref={ref} viewBox={`0 0 ${W} ${H1 + H2 + 10}`} className="w-full touch-none select-none" onPointerMove={onMove} onPointerDown={onMove}
           tabIndex={0} role="img" aria-label="Hourly forecast chart. Use left and right arrow keys to inspect hours."
           onKeyDown={(e) => { if (e.key === 'ArrowRight') setI((v) => Math.min(data.length - 1, (v ?? -1) + 1)); if (e.key === 'ArrowLeft') setI((v) => Math.max(0, (v ?? 1) - 1)); }} onBlur={() => setI(null)}>
@@ -36,7 +40,7 @@ export function HourlyChart({ hours }: { hours: H[] }) {
           {ticks.map((t) => <g key={t}><line x1={PAD.l} x2={W - PAD.r} y1={y(t)} y2={y(t)} stroke="#DFE6EE" strokeWidth="1" /><text x={PAD.l - 8} y={y(t) + 4} textAnchor="end" fontSize="11" fill="#4A5A74">{t}°</text></g>)}
           <path d={area} fill="url(#tg)" />
           <path d={line} fill="none" stroke="#214FA1" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
-          {data.map((d, n) => n % 3 === 0 && <text key={n} x={x(n)} y={H1 - 4} textAnchor="middle" fontSize="11" fill="#4A5A74">{hr(d.start)}</text>)}
+          {data.map((d, n) => n % (W < 520 ? 6 : 3) === 0 && <text key={n} x={x(n)} y={H1 - 4} textAnchor="middle" fontSize="11" fill="#4A5A74">{hr(d.start)}</text>)}
           {/* Precipitation (separate chart, own baseline, single hue) */}
           <text x={PAD.l - 8} y={H1 + 18} textAnchor="end" fontSize="10" fill="#4A5A74">Rain</text>
           {data.map((d, n) => { const h = ((d.pop ?? 0) / 100) * (H2 - 14); const bw = (W - PAD.l - PAD.r) / data.length - 2;

@@ -43,8 +43,9 @@ Input: GIS Planning ZoomProspector property API (or CoStar export) → map `prop
 | `GET /api/map/points` | Map data (published, geocoded) | Cached 10 min |
 | `GET /api/search?q=` / `?type=` / `?ids=` | Typeahead | Published only, rate limit |
 | `POST /api/itineraries`, `GET/PUT /api/itineraries/[token]` | Trip planner share | Edit requires private token (hashed, timing-safe compare) |
+| `POST /api/collections` | Share a saved list (read-only snapshot link) | Published records only, rate limit 20/h |
 | `POST /api/concierge` | Concierge | Rate limit (12/10 min), length limits |
 | `POST /api/track` | First-party analytics beacon | Allow-listed event names, rate limit |
 | `GET /api/events/[id]/ics` | Calendar file | Published only |
-| `GET /api/admin/media`, `/api/admin/redirects.csv` | CMS helpers | Session + permission |
+| `GET /api/admin/media`, `/api/admin/redirects.csv`, `/api/admin/analytics.csv` | CMS helpers | Session + permission |
 | `GET /sitemap.xml`, `/edo-sitemap.xml`, `/robots.txt` | SEO | Fixtures & noindex pages excluded; robots blocks all unless `ALLOW_INDEXING=true` |

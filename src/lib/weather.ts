@@ -42,7 +42,7 @@ async function getJson(url: string, timeoutMs = 8000) {
   let lastErr: unknown;
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const r = await fetch(url, { headers: { 'user-agent': UA, accept: 'application/geo+json' }, signal: AbortSignal.timeout(timeoutMs), cache: 'no-store' });
+      const r = await fetch(url, { headers: { 'user-agent': UA, accept: 'application/geo+json' }, signal: AbortSignal.timeout(timeoutMs), next: { revalidate: 600 } });
       if (r.status === 429 || r.status >= 500) throw new Error(`HTTP ${r.status} from ${new URL(url).host}`);
       if (!r.ok) throw Object.assign(new Error(`HTTP ${r.status} from ${new URL(url).host}`), { fatal: true });
       return await r.json();

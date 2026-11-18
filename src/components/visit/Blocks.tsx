@@ -59,7 +59,7 @@ function TileBlock({ heading, items, template }: { heading?: string; items: Tile
       <div key={t.href + i} className="mx-auto max-w-[1440px] px-5 py-10 sm:px-8">
         <Link href={t.href} className={`group grid items-center gap-8 overflow-hidden rounded-[var(--radius-card)] bg-mist lg:grid-cols-2 ${i % 2 ? 'lg:[&>*:first-child]:order-2' : ''}`}>
           <div className="relative aspect-[16/11] overflow-hidden"><Img src={t.image} alt={t.alt ?? ''} fill sizes="(min-width:1024px) 50vw, 100vw" className="object-cover transition duration-[1.2s] group-hover:scale-105" /></div>
-          <div className="p-8 lg:p-14" data-reveal><h2 className="font-display text-4xl leading-[1] text-navy sm:text-5xl">{(i === 0 && heading) || t.title || t.alt}</h2><span className="mt-8 inline-flex items-center gap-2 rounded-full bg-navy px-6 py-3 text-sm font-bold text-white transition group-hover:bg-blue-500">{isExternal(t.href) ? 'Visit website' : 'Explore'}<ArrowUpRight className="size-4" aria-hidden /></span></div>
+          <div className="p-8 lg:p-14" data-reveal><h2 className="font-display text-4xl leading-[1] text-navy sm:text-5xl">{(i === 0 && heading) || t.title}</h2><span className="mt-8 inline-flex items-center gap-2 rounded-full bg-navy px-6 py-3 text-sm font-bold text-white transition group-hover:bg-blue-500">{isExternal(t.href) ? 'Visit website' : 'Explore'}<ArrowUpRight className="size-4" aria-hidden /></span></div>
         </Link>
       </div>
     ))}</>
@@ -72,7 +72,7 @@ function TileBlock({ heading, items, template }: { heading?: string; items: Tile
           <li key={t.href + i} data-reveal style={{ '--reveal-delay': `${(i % 4) * 60}ms` } as React.CSSProperties}>
             <Link href={t.href} className="group block">
               <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)]"><Img src={t.image} alt={t.alt ?? ''} fill sizes="(min-width:1024px) 25vw, 50vw" className="object-cover transition duration-[1.2s] ease-[var(--ease-out-expo)] group-hover:scale-105" /></div>
-              <p className="mt-4 text-lg font-bold leading-snug text-navy group-hover:underline decoration-teal-400 underline-offset-4">{t.title || t.alt}</p>
+              <p className="mt-4 text-lg font-bold leading-snug text-navy group-hover:underline decoration-teal-400 underline-offset-4">{t.title}</p>
             </Link>
           </li>
         ))}

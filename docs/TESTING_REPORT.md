@@ -1,8 +1,8 @@
 # Testing Report
 
-_Run date: 2026-11-17 · Environment: production build (`next build && next start`), PostgreSQL 16, Chromium (Playwright 1.63) · Suite: `npm run test:e2e`_
+_Run date: 2026-11-18 · Environment: production build (`next build && next start`), PostgreSQL 16, Chromium (Playwright 1.63) · Suite: `npm run test:e2e`_
 
-## Result: **82 / 82 passing** (two consecutive full runs, 0 flaky)
+## Result: **87 / 87 passing** (two consecutive full runs, 0 flaky) — and **87 / 87 on a clean-room replay** of the CI pipeline (empty database → migrate → seed → build → test)
 
 | Area | Tests | What is verified |
 |---|---|---|
@@ -20,7 +20,10 @@ _Run date: 2026-11-17 · Environment: production build (`next build && next star
 | EDO | 3 | Every headline figure has a source link; property explorer filter/compare/detail/enquiry; data portal rows all sourced |
 | Accessibility (axe-core, WCAG 2.1 A/AA) | 11 pages | **0 serious/critical violations** (map canvas excluded — list alternative provided) |
 | Keyboard | 1 | Skip link; mega-menu opens on focus, closes on Escape |
-| Mobile (iPhone 13 profile) | 1 | Drawer navigation, routing, **no horizontal scroll** |
+| Mobile (iPhone 13 profile) | 2 | Drawer navigation and routing; **no content wider than the viewport** on 9 key pages (incl. embedded maps) |
+| Saved collections | 2 | Save listing + event → share list → a different visitor opens it and copies it into their own saved places; API rejects unpublished/unknown records |
+| EDO events | 1 | Upcoming / ongoing / past sections; detail page with source link |
+| Analytics | 1 | Trend charts render from recorded events; CSV export |
 | CMS security | 2 | Admin routes & admin APIs require auth; generic login error |
 | CMS workflow | 3 | Draft hidden → publish live → version history → restore-as-draft; scheduled publish hidden until time; path change auto-301 |
 | RBAC | 1 | Tourism staff: publish routed to approval; denied Users and EDO Properties |
@@ -43,6 +46,17 @@ _Run date: 2026-11-17 · Environment: production build (`next build && next star
 | 9 | Server Action 1 MB body limit would reject photo uploads | Raised to 16 MB |
 | 10 | 1.4 MB placeholder map shipped to browsers | Placeholders resolved server-side (JS −70%) |
 | 11 | Directory map markers missing when points passed directly | Map-ready state |
+| 12 | Image manifest had garbled duplicate rows (Cloudinary URLs contain commas; `srcset` was split on every comma) | Split on comma + whitespace; 3,376 unique rows |
+| 13 | Weather fetch marked "unhealthy" during static pre-rendering (`no-store` triggers Next's dynamic-usage signal) | Time-based revalidation (10 min) |
+| 14 | Analytics CSV export returned HTTP 500 (`day` is a reserved word in PostgreSQL) | Explicit `AS` aliases |
+| 15 | EDO contact page overflowed on phones (600 px legacy Google Maps iframe) | `max-width` on EDO prose iframes + overflow test |
+| 16 | Legacy page titles contained a pasted spreadsheet style block as text (12 pages, sitemap & nav labels) | Scrubbed in migration, fall back to the page's own title |
+| 17 | Legacy animated counters rendered as "506.00" in district pages | Removed in migration (figures shown from sourced indicators) |
+| 18 | Untitled legacy tiles used image alt text as headings | Linked page's real title used instead |
+| 19 | Mobile hero showed a soft crop of a 1920×600 banner | Hero uses ≥2400 px official photography only |
+| 20 | Hourly weather chart text unreadable on phones (SVG scaled down) | Chart draws at container pixel width |
+| 21 | Test data (QA pages) appeared in the public sitemap | Global teardown removes all QA records |
+| 22 | EDO header labels wrapped at 1440 px after adding News & Events | Tighter, non-wrapping nav |
 
 ## Performance (production build, local server)
 | Page | Desktop LCP | Mobile LCP (4× CPU, ~1.6 Mbps) | CLS | JS (uncompressed) |
@@ -57,7 +71,7 @@ _Run date: 2026-11-17 · Environment: production build (`next build && next star
 Homepage HTML: 51 KB gzipped. Images: AVIF/WebP responsive via next/image with blurred placeholders.
 
 ## Manual verification performed
-Visual review of homepage (desktop + mobile), directory, listing, weather centre, EDO home, property explorer, CMS dashboard and editor at 1440 px and 390 px; keyboard walkthrough of header/menus, gallery lightbox, calendar and chart; screen-reader semantics spot-checked via accessibility tree snapshots.
+Visual review of **52 page captures** — 32 templates at 1440 px (meetings, RFP, weddings, venues, media, media gallery & item, film, business travelers, blog index & post, events & festival pages, plan your visit, contact, sitemap, offer, Spanish page, things to do, search, saved, concierge, trip planner, map, and EDO incentives, district, industry, events, reports, news, contact, why Chandler) and 20 at phone width (Pixel 7) — plus homepage, listing, directory, weather, EDO home, property explorer and CMS screens; keyboard walkthrough of header/menus, gallery lightbox, calendar and chart; screen-reader semantics spot-checked via accessibility tree snapshots.
 
 ## Not covered / environment limitations (honest list)
 * **Map tiles** could not load in the test sandbox (tile CDN not reachable from the container); markers, filters and list view are tested. Tiles load in normal browsers.

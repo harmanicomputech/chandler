@@ -1,6 +1,6 @@
 # Development Tracker
 
-_Last updated: 2026-11-17_
+_Last updated: 2026-11-18_
 
 | Stage | Status | Notes |
 |---|---|---|
@@ -12,8 +12,18 @@ _Last updated: 2026-11-17_
 | 6 · CMS & administration | ✅ Done | Registry-driven editor, workflow, scheduling, versions, RBAC, media, navigation, redirects, submissions moderation, partner portal, users, settings, audit, analytics |
 | 7 · Integrations | 🟡 Built, awaiting credentials | NWS live; CRM/newsletter/e-mail/GTM/Anthropic/GIS Planning adapters inactive until configured |
 | 8 · Migration | ✅ Done (rights pending) | All content + 2,418 migrated images; redirects; metadata preserved |
-| 9 · Testing | ✅ 82/82 E2E + axe passing | See TESTING_REPORT.md for limitations |
+| 9 · Testing | ✅ 87/87 E2E + axe passing (also on a clean-room CI replay) | See TESTING_REPORT.md for limitations |
 | 10 · Deployment preparation | ✅ Documented | DEPLOYMENT_GUIDE.md, .env.example; not deployed (no City authorisation) |
+
+## Gap-closing iteration (2026-11-18) — all done
+| Gap | Result |
+|---|---|
+| Shareable saved collections | `/saved/` page; *Share this list* creates a read-only link (`/collections/<token>/`); recipients can copy it into their own list; API validates records are published |
+| Visual review of secondary templates | 52 captures reviewed (desktop + phone); 11 visual/content defects fixed (see TESTING_REPORT §Defects 12–22) |
+| Economic Development events | `/edo/events/` (upcoming, ongoing, past) + detail pages with Event JSON-LD; 7 events taken verbatim from City pages; homepage strip; nav; sitemap; CMS-managed |
+| CI/CD | `.github/workflows/ci.yml` (Postgres service, type-check, migrate, seed, build, Playwright, `npm audit`); verified by a local clean-room replay |
+| Image manifest | Parsing bug fixed; 3,376 unique rows with status for every image |
+| Analytics dashboards | KPI tiles with period-over-period change, daily trend charts per site, top listings/properties/pages, submissions by type, CSV export — recorded events only |
 
 ## Open dependencies on the City (blocking go-live, not blocking demo)
 1. **Image reuse rights** — confirm 2,418 migrated photos (IMAGE_PERMISSIONS.csv); supply alternatives for 6 files marked *do not share*; supply high-resolution originals where only web sizes exist.

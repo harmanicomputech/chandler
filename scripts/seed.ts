@@ -34,7 +34,12 @@ const supplied: any[] = read('audit/data/supplied-images.json', []);
 const clean = (t?: string | null) => (t ?? '').replace(/\s+/g, ' ').trim();
 const decodeEnt = (t: string) => t.replace(/&amp;/g, '&').replace(/&#39;|&rsquo;/g, '’').replace(/&quot;/g, '"').replace(/&nbsp;/g, ' ');
 const relPath = (u: string) => { const r = u.replace(VC, '') || '/'; try { return decodeURIComponent(r); } catch { return r; } };
-const titleFrom = (p: any) => decodeEnt(clean(p.h1) || clean(p.ogTitle) || clean(p.title).replace(/\s*\|.*$/, ''));
+const scrub = (t?: string | null) => clean((t ?? '').replace(/<!--[\s\S]*?-->/g, '').replace(/[a-z]+\s*\{[^}]*\}/gi, ''));
+/** Page title: legacy h1 (some contain a pasted spreadsheet style block as text — scrubbed), else og:title / <title> before "|". */
+const titleFrom = (p: any) => decodeEnt(scrub(p.h1) || scrub(p.ogTitle).replace(/\s*\|.*$/, '') || clean(p.title).replace(/\s*\|.*$/, ''));
+const pageTitleByPath = (href: string) => { const pg = vcPages.find((x) => !x.error && relPath(x.url) === href); return pg ? titleFrom(pg) : null; };
+/** Tile label: legacy title, else the linked page's own title, else short alt text, else a neutral call to action. */
+const tileTitle = (i: any) => { const t = decodeEnt(clean(i.title)); if (t) return t; const h = (i.href || '').replace(VC, ''); if (h.startsWith('/')) { const pt = pageTitleByPath(h.split('#')[0]); if (pt) return pt; } return i.alt && i.alt.length <= 40 ? i.alt : 'Learn more'; };
 const stripLegacy = (html: string) => (html || '')
   .replace(/ data-sv-[a-z-]+="[^"]*"/g, '').replace(/ data-guid="[^"]*"/g, '')
   .replace(/https:\/\/www\.visitchandler\.com\//g, '/')
@@ -186,7 +191,7 @@ async function main() {
     if (formKey[pth]) blocks.push({ type: 'form', form: formKey[pth] });
     for (const t of p.tiles ?? []) {
       if (pth === '/') continue;
-      const items = t.items.filter((i: any) => i.href && !/^https?:\/\/(?!www\.visitchandler\.com)/.test(i.href) || /^https?:/.test(i.href)).map((i: any) => ({ title: decodeEnt(i.title), href: i.href.replace(VC, ''), image: local(i.image), alt: i.alt }));
+      const items = t.items.filter((i: any) => i.href && !/^https?:\/\/(?!www\.visitchandler\.com)/.test(i.href) || /^https?:/.test(i.href)).map((i: any) => ({ title: tileTitle(i), href: i.href.replace(VC, ''), image: local(i.image), alt: i.alt }));
       if (items.length) blocks.push({ type: 'tiles', template: t.template, heading: decodeEnt(t.heading || ''), items });
     }
     if (p.embeds?.length) blocks.push({ type: 'embeds', items: p.embeds });
@@ -213,11 +218,12 @@ async function main() {
     const introHtml = (home.bodyHtml || '').split('</p>').slice(0, 2).join('</p>') + '</p>';
     const supplied = (f: string) => `/images/homepage/${f}`;
     const blocks = [
+      // Hero: high-resolution official photography only (≥2400 px masters) so portrait crops on phones stay sharp.
       { key: 'hero', headline: 'Where city meets desert.', slides: [
-        { src: supplied('hot-air-expeditions.jpg'), alt: 'Hot air balloons drifting over saguaro cactus in the Sonoran Desert', caption: 'Hot air ballooning over the Sonoran Desert' },
         { src: local(tiles('core_featured_events')?.items?.[0]?.image), alt: 'Couple taking selfie in front of the Tumbleweed Tree in Chandler, AZ', caption: 'Tumbleweed Tree Lighting, Downtown Chandler' },
-        { src: supplied('downtown-family.jpg'), alt: 'Family walking down the sidewalk in Downtown Chandler', caption: 'Downtown Chandler' },
-        { src: supplied('open-graph-lake.jpg'), alt: 'Aerial view of a lake and palm-lined parks in Chandler', caption: 'Chandler from above' },
+        { src: '/images/visitor-resources/downtown-chandler-evening-316acf01-e74a-ecec-c81319adbca5fdcd-4be0f5.jpg', alt: 'Palm-lined street in Downtown Chandler at dusk', caption: 'Evening in Downtown Chandler' },
+        { src: '/images/homepage/just-roughing-it-pc310031-4c00c22e-d505-4c35-a0cd-589d62f31e28-4f514b.jpg', alt: 'Group of hikers on a desert trail near Chandler, AZ on a sunny day', caption: 'Hiking near Chandler' },
+        { src: '/images/media-gallery/thaidancers-dwntwnblock-316a58a3-fe00-666f-ef0ac86849b2045c-4dda36.jpg', alt: 'Dancers in pink dresses performing at Chandler’s annual Multi-Cultural Festival', caption: 'Chandler Multi-Cultural Festival' },
       ].filter((x) => x.src) },
       { key: 'intro', eyebrow: 'Visit Chandler', title: 'Big-city energy, wide-open desert.', html: stripLegacy(introHtml), image: local(gw?.items?.[3]?.image), imageAlt: gw?.items?.[3]?.alt, image2: local(gw?.items?.[2]?.image), image2Alt: gw?.items?.[2]?.alt,
         facts: [{ value: '300+', count: 300, suffix: '+', label: 'days of sunshine a year' }] },
@@ -278,8 +284,11 @@ async function edoMedia(src?: string | null, alt?: string | null): Promise<numbe
     .onConflictDoUpdate({ target: s.media.url, set: { alt: sql`excluded.alt` } }).returning({ id: s.media.id });
   mediaIds.set(m.local, row.id); return row.id;
 }
-const edoHero = (p: any) => (p.images ?? []).find((i: any) => edImageMap[i.src]?.local && (edImageMap[i.src].width ?? 0) >= 700);
+/** Hero photo for an EDO page: first large migrated image that is a photograph, not an infographic tile (e.g. "1.3M SF of Office Space"). */
+const edoHero = (p: any) => (p.images ?? []).find((i: any) => edImageMap[i.src]?.local && (edImageMap[i.src].width ?? 0) >= 700 && !/\bSF of\b|infographic|icon|logo|placeholder/i.test(i.alt ?? '') && !/sf-of|-sf-|infographic/i.test(i.src));
 /** Rewrite City-hosted image URLs in migrated body HTML to their migrated local copies. */
+/** Remove the legacy animated-counter widget (numbers rendered as "506.00 / Total Businesses"); the figures are shown from sourced indicators instead. */
+const stripCounters = (html: string) => html.replace(/<div[^>]*id="number-\d+"[^>]*>\s*[\d.,]+\s*<\/div>\s*<div[^>]*>[^<]*<\/div>/g, '');
 const localiseEdoImgs = (html: string) => html.replace(/src="([^"]+)"/g, (m, u) => { const abs = u.startsWith('http') ? u : CZ + u; return edImageMap[abs]?.local ? `src="${edImageMap[abs].local}"` : m; });
 const edPath = (p: string) => (p.replace(ED_PREFIX, '') || '/').replace(/\/?$/, '/');
 
@@ -290,7 +299,7 @@ async function seedEdo() {
     if (p.section === 'blog') pth = '/news/' + p.path.split('/').pop() + '/';
     else if (p.section === 'news') pth = '/news/' + p.path.split('/').pop() + '/';
     else pth = edPath(p.path);
-    const body = localiseEdoImgs(p.bodyHtml || '').replace(/ (class|style|data-[a-z-]+)="[^"]*"/g, '').replace(/href="\/(?!\/)/g, `href="${CZ}/`).replace(new RegExp(`${CZ}${ED_PREFIX}`, 'g'), '');
+    const body = localiseEdoImgs(stripCounters(p.bodyHtml || '')).replace(/ (class|style|data-[a-z-]+)="[^"]*"/g, '').replace(/href="\/(?!\/)/g, `href="${CZ}/`).replace(new RegExp(`${CZ}${ED_PREFIX}`, 'g'), '');
     const isArticle = p.section === 'blog' || p.section === 'news';
     if (isArticle) {
       const slug = p.path.split('/').pop();
@@ -381,6 +390,30 @@ async function seedEdo() {
     await db.insert(s.reports).values({ title: clean(d.text) || decodeURIComponent(d.href.split('/').pop()!), fileUrl: d.href, category: p.section.replace(/-/g, ' '), publishedOn: yr ? `${yr}-01-01` : null, sourceUrl: p.url, status: 'published' });
   }
 
+  // Business events — verbatim from the City's News & Events and Cursos de Negocios pages.
+  const ne = ed.find((p) => p.path.endsWith('/news-and-events')); const cu2 = ed.find((p) => p.path.endsWith('/cursos-de-negocios'));
+  const edImg = (pg: any, re: RegExp) => { const i = (pg?.images ?? []).find((x: any) => re.test(x.src)); return edoMedia(i?.src, i?.alt); };
+  const LTB_DESC = "This new initiative gives business owners, entrepreneurs, developers, investors and commercial real estate professionals direct access to Economic Development Director, Micah Miranda, with dedicated 30-minute one-on-one meetings scheduled by YOU. Whether you're looking to expand, relocate, invest, redevelop, or navigate city resources, we're here to help.";
+  const CURSOS_INTRO = 'En colaboración con nuestro aliado DAS Foundation, ofrecemos talleres gratuitos, 100% en español, de alta calidad. Los talleres se llevarán a cabo en formato híbrido en el Centro de Innovación ASU Chandler, 249 E. Chicago St., y por Zoom.';
+  const edoEvents = [
+    { key: 'lets-talk-business-2026-11-19', title: "Let's Talk Business — one-on-one with the Economic Development Director", startDate: '2026-11-19', timesText: '8:30 – 11 a.m.', categories: ['Business & Networking'], descriptionHtml: `<p>${LTB_DESC}</p>`, website: '/edo/business-services/lets-talk-business/', src: ne?.url },
+    { key: 'lets-talk-business-2026-10-15', title: "Let's Talk Business — one-on-one with the Economic Development Director", startDate: '2026-10-15', timesText: '8:30 – 11 a.m.', categories: ['Business & Networking'], descriptionHtml: `<p>${LTB_DESC}</p>`, website: '/edo/business-services/lets-talk-business/', src: ne?.url },
+    { key: 'chandler-endeavor', title: 'Chandler Endeavor Venture Innovation Incubator', startDate: null, recurrenceText: 'Ongoing — monthly workshops and coffee + connections', locationName: 'ASU Chandler Innovation Center', address: '249 E. Chicago St., Chandler, AZ', latitude: 33.3030, longitude: -111.8410, categories: ['Startups & Innovation'], descriptionHtml: '<p>City of Chandler and Arizona State University will host a variety of events at the ASU Chandler Innovation Center, 249 E. Chicago St. including monthly workshops and coffee + connections.</p>', src: ne?.url },
+    { key: 'chandler-innovation-fair', title: 'Annual Chandler Innovation Fair', startDate: null, recurrenceText: 'Annually in February', categories: ['Startups & Innovation'], descriptionHtml: '<p>Showcases the businesses, artists, students and innovators in the community as Chandler participates in the statewide Arizona SciTech Festival.</p>', website: '/events/annual-events/innovation-fair/', src: ne?.url },
+    ...[['presupuestos', 'Cursos de Negocios: Presupuestos', '2026-02-25', /presupuestos/], ['estrategias-de-precios', 'Cursos de Negocios: Estrategias de Precios Inteligentes', '2026-03-25', /precios/], ['estados-financieros', 'Cursos de Negocios: Comprensión de Estados Financieros', '2026-04-22', /estados-financieros/]].map(([k, t, d, re]) => ({
+      key: `cursos-${k}`, title: t as string, startDate: d as string, locationName: 'Centro de Innovación ASU Chandler y Zoom (híbrido)', address: '249 E. Chicago St., Chandler, AZ', latitude: 33.3030, longitude: -111.8410, categories: ['Small Business', 'En español'],
+      descriptionHtml: `<p>${CURSOS_INTRO}</p><p><em>Fecha publicada por la Ciudad: ${(d as string).slice(8)} de ${{ '02': 'febrero', '03': 'marzo', '04': 'abril' }[(d as string).slice(5, 7)]}. El año (2026) se infiere de la fecha de publicación de la página.</em></p>`,
+      website: '/edo/news-and-events/cursos-de-negocios/', src: cu2?.url, img: re as RegExp })),
+  ];
+  for (const e of edoEvents) {
+    const slug = e.key.replace(/-\d{4}-\d{2}-\d{2}$/, '') + (e.startDate ? '-' + e.startDate : '');
+    const vals = { site: 'edo' as const, slug, title: e.title, startDate: e.startDate, endDate: e.startDate, timesText: (e as any).timesText ?? null, recurrenceText: (e as any).recurrenceText ?? null,
+      locationName: (e as any).locationName ?? null, address: (e as any).address ?? null, latitude: (e as any).latitude ?? null, longitude: (e as any).longitude ?? null, categories: e.categories, descriptionHtml: e.descriptionHtml,
+      website: (e as any).website ?? null, hostName: 'City of Chandler Economic Development', primaryMediaId: (e as any).img ? await edImg(cu2, (e as any).img) : null, sourceUrl: e.src, sourceId: `ed-event-${e.key}`, status: 'published' as const };
+    await db.insert(s.events).values(vals).onConflictDoUpdate({ target: [s.events.site, s.events.sourceId], set: vals });
+  }
+  console.log('edo events', edoEvents.length);
+
   // Demonstration property fixtures — clearly labelled; replaced by GIS Planning / CoStar feed in production.
   const districts = await db.select().from(s.districts);
   const did = (slug: string) => districts.find((d) => d.slug === slug)?.id ?? null;
@@ -409,7 +442,7 @@ async function seedEdo() {
     ['Sites & Properties', '/properties/', [['Property explorer (map)', '/properties/'], ['Compare properties', '/properties/compare/'], ['Site selection services', '/business-services/site-selection/'], ['Business location strategy', '/business-location-strategy/']]],
     ['Data & Research', '/data/', [['Economic data portal', '/data/'], ['Market research, data & maps', '/market-research-data-and-maps/'], ['Reports & downloads', '/reports/']]],
     ['Business Services', '/business-services/', [['Incentives & funding', '/business-services/incentives-and-funding/'], ['Startups', '/business-services/resources-for-startups/'], ['Small business', '/business-services/small-business-resources/'], ['Workforce development', '/business-services/workforce-development-resources/'], ['Export services', '/business-services/export-services/'], ["Let's Talk Business", '/business-services/lets-talk-business/']]],
-    ['News', '/news-and-events/', []],
+    ['News & Events', '/news-and-events/', [['News & announcements', '/news/'], ['Business events', '/events/'], ['Cursos de Negocios (español)', '/news-and-events/cursos-de-negocios/'], ['News & Events overview', '/news-and-events/']]],
   ];
   const inds = await db.select().from(s.industries); const dists = await db.select().from(s.districts);
   NAV[1][2] = inds.map((x) => [x.name, `/key-industries-and-employers/${x.slug}/`]);

@@ -96,7 +96,7 @@
   .prose-vc ul li { position: relative; padding-left: 1.4em; margin: 0.35em 0; }
   .prose-vc ul li::before { content: ''; position: absolute; left: 0; top: 0.7em; width: 0.5em; height: 0.5em; border-radius: 99px; background: var(--color-teal-400); }
   .prose-vc ol { padding-left: 1.3em; list-style: decimal; }
-  .prose-vc img { border-radius: 1rem; margin: 1.5em 0; height: auto; }
+  .prose-vc img { border-radius: 1rem; margin: 1.5em 0; height: auto; max-height: 34rem; width: auto; max-width: 100%; object-fit: cover; }
   .prose-vc strong { color: var(--color-navy); }
   .prose-vc table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
   .prose-vc th, .prose-vc td { border-bottom: 1px solid var(--color-line); padding: 0.6rem; text-align: left; }
@@ -114,7 +114,8 @@
   .prose-edo table { width: 100%; border-collapse: collapse; font-size: 0.95rem; margin: 1.5em 0; }
   .prose-edo th { text-align: left; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-edo-slate); border-bottom: 2px solid var(--color-edo-navy); padding: 0.6rem; }
   .prose-edo td { border-bottom: 1px solid var(--color-edo-line); padding: 0.7rem 0.6rem; }
-  .prose-edo img { max-width: 100%; height: auto; border-radius: 4px; }
+  .prose-edo iframe { max-width: 100%; border: 0; }
+  .prose-edo img { max-width: min(100%, 22rem); max-height: 24rem; height: auto; border-radius: 4px; object-fit: cover; }
 
   .eyebrow { font-family: var(--font-sans); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; }
   .skeleton { position: relative; overflow: hidden; background: #e8edf2; }

@@ -115,9 +115,9 @@ for (const s of status) {
   $('main img, header img, .hero img').each((_, el) => {
     const $i = $(el);
     add($i.attr('data-src') || $i.attr('src'), $i.attr('alt'), 'img');
-    ($i.attr('data-srcset') || $i.attr('srcset') || '').split(',').forEach((x) => add(x.trim(), $i.attr('alt'), 'srcset'));
+    ($i.attr('data-srcset') || $i.attr('srcset') || '').split(/,\s+/).forEach((x) => add(x.trim(), $i.attr('alt'), 'srcset'));
   });
-  $('main source').each((_, el) => ($(el).attr('data-srcset') || $(el).attr('srcset') || '').split(',').forEach((x) => add(x.trim(), '', 'picture')));
+  $('main source').each((_, el) => ($(el).attr('data-srcset') || $(el).attr('srcset') || '').split(/,\s+/).forEach((x) => add(x.trim(), '', 'picture')));
   $('[style*="background-image"]').each((_, el) => { const m = ($(el).attr('style') || '').match(/url\(['"]?([^'")]+)/); if (m) add(m[1], '', 'background'); });
   if (rec.ogImage) add(rec.ogImage, rec.ogTitle, 'og');
   // Hero: first large image inside the page header/hero region

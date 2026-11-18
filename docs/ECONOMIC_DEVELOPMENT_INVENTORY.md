@@ -1,6 +1,6 @@
 # Chandler Economic Development — Inventory
 
-_Generated 2026-11-17 from a crawl of chandleraz.gov (business & economic-development sections, related news/blog) cross-checked against the new CMS._
+_Generated 2026-11-18 from a crawl of chandleraz.gov (business & economic-development sections, related news/blog) cross-checked against the new CMS._
 
 ## Scope
 

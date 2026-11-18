@@ -95,7 +95,7 @@ export function SiteHeader({ main, utility, overlay }: { main: NavNode[]; utilit
 
           <div className="ml-auto flex items-center gap-1 lg:ml-2">
             <Link href="/search/" aria-label="Search Visit Chandler" className={`grid size-11 place-items-center rounded-full transition-colors ${solid ? 'hover:bg-blue-50' : 'hover:bg-white/10'}`}><Search className="size-5" /></Link>
-            <Link href="/trip-planner/" aria-label={`Saved places and trip planner (${saved} saved)`} className={`relative grid size-11 place-items-center rounded-full transition-colors ${solid ? 'hover:bg-blue-50' : 'hover:bg-white/10'}`}>
+            <Link href="/saved/" aria-label={`Saved places (${saved} saved)`} className={`relative grid size-11 place-items-center rounded-full transition-colors ${solid ? 'hover:bg-blue-50' : 'hover:bg-white/10'}`}>
               <Heart className="size-5" />
               {saved > 0 && <span className="absolute right-1.5 top-1.5 grid min-w-[18px] place-items-center rounded-full bg-teal-400 px-1 text-[10px] font-bold text-navy">{saved}</span>}
             </Link>

@@ -30,13 +30,13 @@ export function EdoHeader({ nav }: { nav: Nav[] }) {
             {nav.map((n, i) => (
               <li key={n.id} onMouseEnter={() => setOpen(n.children.length ? i : null)}>
                 <Link href={h(n.href)} onFocus={() => setOpen(n.children.length ? i : null)} aria-expanded={n.children.length ? open === i : undefined}
-                  className={`flex items-center gap-1 px-3.5 py-6 text-[14px] font-semibold text-edo-ink transition-colors hover:text-edo-skytext ${path.startsWith(h(n.href)) ? 'text-edo-skytext shadow-[inset_0_-3px_0_var(--color-edo-sky)]' : ''}`}>
+                  className={`flex items-center gap-1 whitespace-nowrap px-2.5 py-6 text-[13.5px] font-semibold text-edo-ink transition-colors hover:text-edo-skytext ${path.startsWith(h(n.href)) ? 'text-edo-skytext shadow-[inset_0_-3px_0_var(--color-edo-sky)]' : ''}`}>
                   {n.label}{n.children.length > 0 && <ChevronDown className="size-3.5 opacity-60" aria-hidden />}
                 </Link>
               </li>
             ))}
           </ul></nav>
-          <Link href={h('/contact-us/initiate-a-project/')} className="ml-auto hidden items-center gap-2 bg-edo-navy px-5 py-3 text-sm font-semibold text-white transition hover:bg-edo-sky xl:ml-4 xl:inline-flex">Initiate a project <ArrowRight className="size-4" aria-hidden /></Link>
+          <Link href={h('/contact-us/initiate-a-project/')} className="ml-auto hidden items-center gap-2 whitespace-nowrap bg-edo-navy px-4 py-3 text-sm font-semibold text-white transition hover:bg-edo-sky xl:ml-3 xl:inline-flex">Initiate a project <ArrowRight className="size-4" aria-hidden /></Link>
           <button onClick={() => setDrawer(true)} aria-label="Open menu" aria-expanded={drawer} className="ml-auto grid size-11 place-items-center xl:hidden"><Menu /></button>
         </div>
         {nav.map((n, i) => n.children.length > 0 && (

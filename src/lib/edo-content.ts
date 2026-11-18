@@ -30,3 +30,17 @@ export async function queryProperties(qy: PropertyQuery = {}) {
 export const getProperty = cache(async (slug: string) => (await db.select({ p: properties, district: districts.name, districtSlug: districts.slug, img: media.url }).from(properties)
   .leftJoin(districts, eq(properties.districtId, districts.id)).leftJoin(media, eq(properties.primaryMediaId, media.id)).where(and(eq(properties.slug, slug), live(properties))).limit(1))[0] ?? null);
 void isNull;
+
+/* ───────────── Business events (site = edo) ───────────── */
+export const getEdoEvents = cache(async () => {
+  const rows = await db.select({ e: schema.events, img: media.url, imgAlt: media.alt }).from(schema.events).leftJoin(media, eq(schema.events.primaryMediaId, media.id))
+    .where(and(eq(schema.events.site, 'edo'), eq(schema.events.status, 'published'))).orderBy(sql`${schema.events.startDate} asc nulls last`);
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Phoenix' });
+  return {
+    upcoming: rows.filter((r) => r.e.startDate && (r.e.endDate ?? r.e.startDate) >= today),
+    ongoing: rows.filter((r) => !r.e.startDate),
+    past: rows.filter((r) => r.e.startDate && (r.e.endDate ?? r.e.startDate) < today).reverse(),
+  };
+});
+export const getEdoEvent = cache(async (slug: string) => (await db.select({ e: schema.events, img: media.url, imgAlt: media.alt }).from(schema.events).leftJoin(media, eq(schema.events.primaryMediaId, media.id))
+  .where(and(eq(schema.events.site, 'edo'), eq(schema.events.slug, slug), eq(schema.events.status, 'published'))).limit(1))[0] ?? null);

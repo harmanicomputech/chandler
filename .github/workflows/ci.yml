@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: chandler
+          POSTGRES_PASSWORD: chandler_ci
+          POSTGRES_DB: chandler
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U chandler" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://chandler:chandler_ci@localhost:5432/chandler
+      VISIT_SITE_URL: http://localhost:3001
+      EDO_SITE_URL: http://localhost:3001
+      NEXT_PUBLIC_EDO_BASE_PATH: /edo
+      SEED_PASSWORD: ci-only-Password-123
+      LOGIN_RATE_LIMIT: '500'
+      CONCIERGE_MODE: retrieval
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: Type-check
+        run: npx tsc --noEmit
+      - name: Migrate database
+        run: npm run db:migrate
+      - name: Migrate content (seed from audit data)
+        run: npm run db:seed
+      - name: Build
+        run: npm run build
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Start server
+        run: |
+          npm start -- -p 3001 > server.log 2>&1 &
+          npx wait-on -t 60000 http://localhost:3001/
+      - name: End-to-end + accessibility tests
+        run: npx playwright test --trace off
+      - name: Dependency audit (production, high+)
+        run: npm audit --omit=dev --audit-level=high
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            test-results/
+            server.log

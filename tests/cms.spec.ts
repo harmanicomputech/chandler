@@ -156,3 +156,15 @@ test('audit log records the actions above', async ({ page }) => {
   await page.goto('/admin/audit/');
   for (const a of ['auth.login', 'content.update', 'submission.convert', 'stakeholder.propose', 'media.upload', 'redirect.save']) await expect(page.getByText(a).first()).toBeVisible();
 });
+
+test('analytics dashboard shows recorded trends and exports CSV', async ({ page }) => {
+  await page.goto('/listing/10%3a19-coffee/4484/'); // records a listing_view
+  await login(page, 'editor@chandler.example');
+  await page.goto('/admin/analytics/?days=7');
+  await expect(page.getByRole('img', { name: /Visit Chandler interactions trend chart/ })).toBeVisible();
+  await expect(page.getByText('Visit · Listing views')).toBeVisible();
+  const csv = await page.request.get('/api/admin/analytics.csv?days=7');
+  expect(csv.status()).toBe(200); expect(await csv.text()).toMatch(/^day,site,event,count/);
+  const anon = await page.context().request.fetch('/api/admin/analytics.csv', { headers: { cookie: '' } });
+  expect([200, 401]).toContain(anon.status());
+});

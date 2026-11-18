@@ -33,7 +33,7 @@ export default async function EdoPage({ params }: P) {
   return (
     <>
       <EdoHero title={page.title} summary={page.summary} image={page.hero?.url} crumbs={crumbs} />
-      {dStats.length > 0 && <div className="mx-auto -mt-10 grid max-w-[1440px] grid-cols-2 gap-px px-5 sm:px-8 lg:grid-cols-6">{dStats.map((s) => <Stat key={s.key} value={s.value} label={s.label.split(': ')[1]} source={s.sourceUrl} asOf={s.asOf} />)}</div>}
+      {dStats.length > 0 && <div className="relative z-10 mx-auto -mt-10 grid max-w-[1440px] grid-cols-2 gap-px px-5 sm:px-8 lg:grid-cols-6">{dStats.map((s) => <Stat key={s.key} value={s.value} label={s.label.split(': ')[1]} source={s.sourceUrl} asOf={s.asOf} />)}</div>}
       <div className="mx-auto grid max-w-[1440px] gap-14 px-5 py-16 sm:px-8 lg:grid-cols-12">
         <div className="lg:col-span-8">
           {page.bodyHtml && <div className="prose-edo" dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.bodyHtml) }} />}
